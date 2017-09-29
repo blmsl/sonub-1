@@ -15,15 +15,12 @@ export class ForumViewPage implements OnInit {
         public app: AppService
     ) {
         active.params.subscribe(params => {
-
             this.post = null;
-
             this.app.forum.postData(params['id'])
-                .subscribe(post => this.post = post, e => this.app.warning(e));
-
-
-
-
+                .subscribe(post => {
+                    this.post = app.forum.pre(post);
+                    console.log("ForumViewPage::constructor() ==> active.params.subscribe() ==> app.forum.postData(): ", this.post);
+                }, e => this.app.warning(e));
         });
 
     }

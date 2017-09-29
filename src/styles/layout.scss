@@ -4,8 +4,8 @@ body {
     padding: 0;
 }
 
-/// header layout only. no size, no placement.
-section.page {
+/// header layout only. no size, no placment.
+section.page-layout {
     background-color: $background-color;
     .page-header {
         position: fixed;
@@ -43,7 +43,8 @@ section.page {
                 }
             }
         }
-    } // &[layout="wide"] {
+    }//
+    // &[layout="wide"] {
     //     .page-header {
     //         .page-header-container-center {
     //             margin: 0 2px 0 8px;
@@ -58,7 +59,7 @@ section.page {
 
 ///
 /// body column layout. no placement, sizing
-section.page {
+section.page-layout {
     .page-body {
         margin-top: $header-height - $header-border-bottom-height;
         padding: 8px;
@@ -106,9 +107,11 @@ section.page {
             .c {
                 position: absolute;
                 display: block;
+                z-index: 1!important;
                 top: 0;
                 right: 0;
                 width: $c-width;
+                height: 800px;
             }
         }
     }
@@ -174,10 +177,11 @@ section.page {
     }
 }
 
+
 .fix-sidebar-c {
-    position: fixed;
     width: $c-width;
 }
+
 
 .fix-sidebar-d {
     position: fixed;

@@ -1,35 +1,139 @@
 <section class="buyandsell-list-page">
 
-    <div class="job-list-page-header mb-3">
+    <div class="buyandsell-list-page-header mb-1">
         <div class="d-flex justify-content-between bg-white">
-            <h3 class="title m-0 p-3 lightblack">Buy and Sell</h3>
+            <h3 class="title m-0 p-3 lightblack">{{ text.buyandsell }}</h3>
             <div class="text-right fs-xs flex flex-column justify-content-between">
-                <a class="p-2 blue" id="post-list-create-button" href="/buyandsell/create" routerLink="/buyandsell/create">{{ app.text('create_a_post') }}</a>
-                <div class="pr-2 pb-2 fs-sm">Page 1. 438 posts.</div>
+                <a class="p-2 blue" id="buyandsell-list-create-button" href="/buyandsell/create" routerLink="/buyandsell/create">{{ app.text('create_a_post') }}</a>
+                <div *ngIf="pages.length" class="pr-2 pb-2 fs-sm">Total items: {{pages[0]['count'] | number }}</div>
+
             </div>
         </div>
-        <small>This is Buy and Sell forum.</small>
+        <small>{{ text.buyandsell }}</small>
+    </div>
+
+    <form [formGroup]="formGroup" novalidate class="search-form">
+
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="{{ text.buyandsell_search_holder }}" formControlName="tag">
+            <span class="input-group-btn">
+                <button class="btn btn-secondary pointer" type="button"><i class="fa fa-search"></i></button>
+            </span>
+        </div>
+
+
+        <ng-container *ngIf="formGroup.value.tag.length">
+
+            <div class="row-container mb-3">
+                <label class="text">Price</label>
+                <div class="input">
+                    <label class="form-check-inline">
+                        <input type="number" id="min" formControlName="priceMinimum" placeholder="Minimum">
+                    </label>
+                    <label class="form-check-inline">
+                        <input type="number" id="max" formControlName="priceMaximum" placeholder="Maximum">
+                    </label>
+                </div>
+            </div>
+
+            <div class="row-container">
+                <label class="text">Used Item?</label>
+                <div class="input">
+                    <label class="form-check-inline">
+                        <input type="checkbox" id="usedItem1" formControlName="usedItemYes"> Yes
+                    </label>
+                    <label class="form-check-inline">
+                        <input type="checkbox" id="usedItem2" formControlName="usedItemNo"> No
+                    </label>
+                    <label class="form-check-inline">
+                        <input type="checkbox" id="usedItem3" formControlName="usedItemNA"> Not Applicable
+                    </label>
+                </div>
+            </div>
+
+            <div class="row-container">
+                <label class="text">Deliverable?</label>
+                <div class="input">
+                    <label class="form-check-inline">
+                        <input type="checkbox" id="deliver1" formControlName="deliverableYes"> Yes
+                    </label>
+                    <label class="form-check-inline">
+                        <input type="checkbox" id="deliver2" formControlName="deliverableNo"> No
+                    </label>
+                </div>
+            </div>
+
+
+            <div class="row-container">
+                <label class="text">Location</label>
+                <div class="input">
+                    <select class="form-control custom-select" id="province" formControlName="province" (change)="onClickProvince()">
+                        <option value="all">All</option>
+                        <option *ngFor="let province of provinces" [value]="province">{{province}}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row-container" *ngIf="showCities">
+                <label class="text" *ngIf="showCities">City</label>
+                <div class="input">
+                    <select class="form-control custom-select" id="city" formControlName="city">
+                        <option *ngFor="let key of cityKeys" [value]="key">{{cities[key]}}</option>
+                    </select>
+                </div>
+            </div>
+
+        </ng-container>
+
+
+    </form>
+
+    <div class="card p-1 mb-1" *ngIf="formGroup.value.tag.length">
+        <div class="search-summary">
+            <span>Searching...</span>
+            <span *ngIf="formGroup.value.myPost"> My Items</span>
+            <span *ngIf="formGroup.value.tag"> "{{formGroup.value.tag}}" on tag,title,or description </span>
+            <span> price starts at "{{formGroup.value.priceMinimum ? formGroup.value.priceMinimum : '0'}}"</span>
+            <span *ngIf="formGroup.value.priceMaximum"> between "{{formGroup.value.priceMaximum}}"</span>
+            <span *ngIf="formGroup.value.usedItemYes"> and it is Used Item "</span>
+            <span *ngIf="formGroup.value.usedItemNo"> and it not Used Item "</span>
+            <span *ngIf="formGroup.value.usedItemNA"> and it not applicable as Used Item"</span>
+            <span *ngIf="formGroup.value.deliverableYes"> and it can be delivered"</span>
+            <span *ngIf="formGroup.value.deliverableYes"> and it cannot be delivered"</span>
+            <span *ngIf="formGroup.value.province != 'all' && formGroup.value.city == formGroup.value.province">and province "{{formGroup.value.province}}" </span>
+            <span *ngIf="formGroup.value.city != 'all' && formGroup.value.city != formGroup.value.province">and province "{{formGroup.value.city}}" </span>
+        </div>
     </div>
 
 
     <div class="container p-0" *ngIf="pages">
-        <div class="jobs mx-0 row no-gutters-job">
+        <div class="buyandsells mx-0 row no-gutters-buyandsell">
             <ng-container *ngFor="let page of pages ">
-                <a class="job col-6 mb-1"
+                <div *ngIf="page['query']?.page !=1" class="inline-buyandsell-list-page-header">
+                    <div class="d-flex justify-content-between bg-white">
+                        <h3 class="title m-0 p-3 lightblack">{{ text.buyandsell }}</h3>
+                        <div class="text-right fs-xs flex flex-column justify-content-between">
+                            <a class="p-2 blue" href="/buyandsell/create" routerLink="/buyandsell/create">{{ app.text('create_a_post') }}</a>
+                            <div class="pr-2 pb-2 fs-sm">
+                                Page {{page['query']?.page}}. Total {{page['count']}} posts.
+                                <span class="pointer" (click)="app.scrollToY(0)"><i class="fa fa-search"></i> Search</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <a class="buyandsell col-6 mb-1"
                    *ngFor="let product of page.posts "
                    [attr.post-id]="product.ID"
-                   (click)="onClickShowProductView( product )"
+                   routerLink="/buyandsell/view/{{product.ID}}"
                 >
-                    <div class="profile bg-white">
-
-                        <div class="photo p-2 pt-3 flex justify-content-center">
-                            <img src="{{ urlPhoto( product ) }}">
+                    <div class="product">
+                        <div *ngIf="product.files.length" class="photo flex p-2 justify-content-center">
+                            <img class="mw-100" src="{{ urlPhoto( product ) }}">
                         </div>
-
                         <div class="info p-2">
-                            <div>{{product?.title }}</div>
-                            <div>Price: {{product?.price }}</div>
-                            <div>Place: {{product?.province}}</div>
+                            <div class="product_title">{{product?.title }}</div>
+                            <div class="price">₱ {{numberWithCommas( product?.price ) }}</div>
+                            <div class="location">{{ product?.province != product?.city ? product?.city : product?.province}}</div>
                         </div>
                     </div>
                 </a>
@@ -41,7 +145,8 @@
     </div>
 
     <div *ngIf="noMorePosts">
-        <h3 class="text-center">No more posts ... !</h3>
+        <h3 class="text-center no-more-post">No more posts ... !</h3>
     </div>
 
 </section>
+

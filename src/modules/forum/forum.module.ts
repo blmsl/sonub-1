@@ -29,37 +29,33 @@ import { PostViewWidget } from './../../widgets/post-view/post-view';
 import { ForumViewPage } from './pages/view/view';
 
 
-import { AdvertisementCreateEditPage } from './pages/advertisement-create-edit/advertisement-create-edit';
-import { AdvertisementListPage } from './pages/advertisement-list/advertisement-list';
-
 import { JobCreateEditPage } from './pages/job-create-edit/job-create-edit';
 import { JobListPage } from './pages/job-list/job-list';
-import { MyPostsPage } from './pages/my-posts/my-posts';
+import { JobViewPage } from './pages/job-view/job-view';
+import { PostsPage } from './pages/posts/posts';
 
 import { BuyAndSellCreateEditPage } from './pages/buy-and-sell-create-edit/buy-and-sell-create-edit';
 import { BuyAndSellListPage } from "./pages/buy-and-sell-list/buy-and-sell-list";
-import {BuyAndSellViewContent} from "./modals/buy-and-sell-view/buy-and-sell-view.content";
-import {BuyAndSellViewModalService} from "./modals/buy-and-sell-view/buy-and-sell-view.modal";
+import { BuyAndSellViewPage} from "./pages/buy-and-sell-view/buy-and-sell-view";
+
 
 
 
 const appRoutes: Routes = [
 
     /// my posts
-    { path: 'my-posts', component: MyPostsPage },
+    { path: 'posts/:uid', component: PostsPage },
 
-
-    /// advertisement
-    { path: 'adv/create', component: AdvertisementCreateEditPage },
-    { path: 'adv/edit/:id', component: AdvertisementCreateEditPage },
-    { path: 'adv/list', component: AdvertisementListPage },
 
     { path: 'job/create', component: JobCreateEditPage},
     { path: 'job/edit/:id', component: JobCreateEditPage},
+    { path: 'job/view/:id', component: JobViewPage},
     { path: 'job', component: JobListPage},
 
 
     { path: 'buyandsell/create', component: BuyAndSellCreateEditPage},
+
+    { path: 'buyandsell/view/:id', component: BuyAndSellViewPage},
     { path: 'buyandsell/edit/:id', component: BuyAndSellCreateEditPage},
     { path: 'buyandsell', component: BuyAndSellListPage},
 
@@ -81,19 +77,17 @@ const appRoutes: Routes = [
         // CommentViewComponent,
         CommentEditContent,
         ForumViewPage,
-        AdvertisementCreateEditPage,
-        AdvertisementListPage,
         JobCreateEditPage,
         JobListPage,
+        JobViewPage,
         BuyAndSellCreateEditPage,
         BuyAndSellListPage,
-        BuyAndSellViewContent,
-        MyPostsPage
+        BuyAndSellViewPage,
+        PostsPage
     ],
     entryComponents: [
         PostCreateEditContent,
-        CommentEditContent,
-        BuyAndSellViewContent
+        CommentEditContent
     ],
     imports: [
         CommonModule,
@@ -106,8 +100,7 @@ const appRoutes: Routes = [
     providers: [
         PostCreateEditModalService,
         CommentEditModalService,
-        ForumCodeShareService,
-        BuyAndSellViewModalService
+        ForumCodeShareService
     ]
 })
 export class ForumModule { }

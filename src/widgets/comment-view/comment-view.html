@@ -1,29 +1,65 @@
 <div class="comment-view mb-3" [attr.comment-id]="comment.comment_ID" [attr.depth]="comment.depth">
 
     <div class="comment-content-area fs-xs">
-        <table cellpadding="0" cellspacing="0">
+        <table cellpadding="0" cellspacing="0" width="100%">
             <tr valign="top">
                 <td>
                     <div class="mr-2">
                         <i class="fa fa-mail-forward fa-flip-vertical grey" aria-hidden="true"></i>
                     </div>
                 </td>
-                <td><img class="size-36px" src="{{ app.postUserPhotoUrl( comment )}}"></td>
                 <td>
-                    <div class="ml-2">
+                    <div
+                        (click)="onClickUserProfile($event)"
+                        (mouseenter)="onMouseEnterUserProfile($event)"
+                        (mouseleave)="onMouseLeaveUserProfileMenu()"
+                    >
+                        <img class="size-36px" src="{{ app.postUserPhotoUrl( comment )}}">
+
+                    <div ngbDropdown #profileDropdown="ngbDropdown" placement="bottom-left" class="d-inline-block">
+                            <div ngbDropdownMenu class="user-profile-popup p-0 min-width-250px">
+                                <div class="header flex p-2 bg-lightgrey" routerLink="/profile/{{ comment.author.ID }}">
+                                    <img class="xy-50px" src="{{ app.postUserPhotoUrl(comment) }}">
+                                    <div class="pl-2">
+                                        <div>{{ comment.author.name }}</div>
+                                        <div class="fs-xs">2017-08-27 Lv. 31</div>
+                                    </div>
+                                </div>
+                                <div class="content py-2 fs-sm pointers">
+                                    <button class="dropdown-item" routerLink="/chat/{{ comment.author.ID }}/{{ comment.author.name }}">Chat with {{ comment.author.name }}</button>
+                                    <button class="dropdown-item" routerLink="/posts/{{ comment.author.ID }}">Posts of {{ comment.author.name }}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </td>
+                <td>
+                    <div class="comment-content ml-2 break-all">
                         <div class="mb-2">
-                            {{ comment.comment_ID }}
-                            {{ comment.author.name }} {{ app.shortDate( comment.meta.timestamp_create ) }} {{ comment.comment_content }}
+                            <span class="author-name"
+                                (click)="onClickUserProfile($event)"
+                                (mouseenter)="onMouseEnterUserProfile($event)"
+                                (mouseleave)="onMouseLeaveUserProfileMenu()"
+                            >{{ comment.author.name }}</span>
+
+                            {{ app.shortDate( comment.meta.timestamp_create ) }}
+                            {{ comment.comment_content }}
                         </div>
                         <file-display-widget [files]="comment.files"></file-display-widget>
+                        <site-preview-widget [preview]="comment.site_preview"></site-preview-widget>
+
+                        <ul class="buttons mt-2 pointers">
+
+                            <li (click)="onClickLike( 'like' )">Like <span class="badge badge-dark" *ngIf="comment.meta['like']">{{ comment.meta['like'] }}</span></li>
+                            <li (click)="onClickLike( 'dislike' )">Dislike <span class="badge badge-dark" *ngIf="comment.meta['dislike']">{{ comment.meta['dislike'] }}</span></li>
 
 
-                        <ul class="buttons mt-2">
-                            <li>Like</li>
+
                             <li (click)="showReply=!showReply">Reply</li>
-                            <li (click)="onClickEdit()">Edit</li>
-                            <li (click)="onClickDelete()">Delete</li>
-                            <li>More</li>
+                            <li *ngIf="app.my(comment)" (click)="onClickEdit()">Edit</li>
+                            <li *ngIf="app.my(comment)" (click)="onClickDelete()">Delete</li>
+                            <!-- <li>More</li> -->
                         </ul>
                     </div>
 

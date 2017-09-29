@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 
 
 import { FileDisplayWidget } from './file-display/file-display';
@@ -24,15 +24,24 @@ import { ActivityWidget } from './activity/activity';
 import { CopyrightWidget } from './copyright/copyright';
 import { UserLoginLogoutWidget } from './user-login-logout/user-login-logout';
 import { SidebarForumMenuWidget } from './sidebar-forum-menu/sidebar-forum-menu';
-import { AdvertisementMyListSidebarWidget } from './advertisement-my-list-sidebar/advertisement-my-list-sidebar';
+// import { AdvertisementMyListSidebarWidget } from './advertisement-my-list-sidebar/advertisement-my-list-sidebar';
 import { CommunityLogWidget } from './community-log/community-log';
+import { SitePreviewWidget } from './site-preview/site-preview';
+
+import { RecentPopularPostsWidget } from './recent-popular-posts/recent-popular-posts';
+
+import { LoadingWidget } from './loading/loading';
+import { NoMoreWidget } from './no-more/no-more';
+
+
 
 @NgModule({
     imports: [
         CommonModule,
         RouterModule,
         FormsModule,
-        NgbDropdownModule
+        NgbDropdownModule,
+        NgbPopoverModule
     ],
     exports: [
         FileDisplayWidget,
@@ -50,8 +59,12 @@ import { CommunityLogWidget } from './community-log/community-log';
         CopyrightWidget,
         UserLoginLogoutWidget,
         SidebarForumMenuWidget,
-        AdvertisementMyListSidebarWidget,
-        CommunityLogWidget
+        // AdvertisementMyListSidebarWidget,
+        CommunityLogWidget,
+        SitePreviewWidget,
+        RecentPopularPostsWidget,
+        LoadingWidget,
+        NoMoreWidget
     ],
     declarations: [
         FileDisplayWidget,
@@ -69,8 +82,12 @@ import { CommunityLogWidget } from './community-log/community-log';
         CopyrightWidget,
         UserLoginLogoutWidget,
         SidebarForumMenuWidget,
-        AdvertisementMyListSidebarWidget,
-        CommunityLogWidget
+        // AdvertisementMyListSidebarWidget,
+        CommunityLogWidget,
+        SitePreviewWidget,
+        RecentPopularPostsWidget,
+        LoadingWidget,
+        NoMoreWidget
     ],
     providers: [],
 })

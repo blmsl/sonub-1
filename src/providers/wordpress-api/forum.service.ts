@@ -4,6 +4,7 @@ import { ERROR, error } from './../../etc/error';
 import { WordpressApiService } from './wordpress-api.service';
 import { UserService } from './user.service';
 import { Observable } from 'rxjs/Observable';
+import { DomSanitizer } from '@angular/platform-browser';
 import 'rxjs/add/observable/throw';
 
 
@@ -18,7 +19,8 @@ import {
     CATEGORIES,
     POST_DELETE_RESPONSE,
     COMMENT_DELETE, COMMENT_DELETE_RESPONSE,
-    FILE
+    FILE,
+    SITE_PREVIEW
 
 } from './interface';
 
@@ -28,8 +30,10 @@ export class ForumService extends Base {
 
 
     constructor(
+        private domSanitizer: DomSanitizer,
         private wp: WordpressApiService,
-        private user: UserService
+        private user: UserService,
+        // private ngZone: NgZone
     ) {
         super();
     }
@@ -50,6 +54,10 @@ export class ForumService extends Base {
             thumbnail: '200x200'
         };
         return this.wp.post(data)
+            // .map( v => {
+            //     setTimeout(() => this.ngZone.run(()=>{}), 100);
+            //     return v;
+            // })
             // .map(v => this.parepareData(v));
     }
 
@@ -92,7 +100,7 @@ export class ForumService extends Base {
 
 
     /**
-     * 
+     *
      * @example test.service.ts
      * @param req Comment create data
      */
@@ -143,7 +151,7 @@ export class ForumService extends Base {
 
 
     getFirstImage(post: POST): FILE {
-        if (post.files && post.files.length) {
+        if ( post && post.files && post.files.length) {
             for (let file of post.files) {
                 if (file.type.indexOf('image') == -1) continue;
                 else return file;
@@ -164,4 +172,49 @@ export class ForumService extends Base {
         else return null;
     }
 
+
+    preview(url: string): Observable<SITE_PREVIEW> {
+        return this.wp.post({ route: 'wordpress.site_preview', session_id: this.user.sessionId, url: url });
+    }
+    deletePreview(id: number): Observable<SITE_PREVIEW> {
+        return this.wp.post({ route: 'wordpress.delete_site_preview', session_id: this.user.sessionId, id: id });
+    }
+
+
+    /**
+     * This does pre-processing for a post.
+     *
+     * @attention @warning 'post_content' is sanitized and saved at *post_content_pre*
+     *
+     * @param post - the post. call by reference.
+     * @param o - options
+     *          o['safe'] - if it is set to true, it does domSanitizing.
+     *          o['autolink'] - if it is set to true, then URL in content will become clickable A tags.
+     *
+     * @return post - it's call by reference so, no need to save the return value unless you need.
+     * @code
+     *  this.app.forum.pre( post );
+     * @endcode
+     */
+    pre(post: POST): POST {
+        post.post_content_pre = this.htmlify(post.post_content, { safe: true, autolink: true });
+        post.post_content_pre = <any>this.domSanitizer.bypassSecurityTrustHtml(post.post_content_pre);
+        return post;
+    }
+
+    /**
+     * Does 'pre' process for page.
+     * @param page page from server
+     * @param o options
+     * @example
+     *      this.app.forum.prePage( page );
+     *
+     */
+    prePage(page: PAGE ) {
+        if (page.posts && page.posts.length) {
+            for (let i = 0; i < page.posts.length; i++) {
+                page.posts[i] = this.pre(page.posts[i]);
+            }
+        }
+    }
 }

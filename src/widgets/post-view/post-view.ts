@@ -1,7 +1,7 @@
 /**
  * Post View Widget is not only used in forum pages but also other pages.
  * So, it is not in forum pages folder.
- * 
+ *
  * When you need it, import it in that module and use it.
  */
 import { Component, OnInit, Input } from '@angular/core';
@@ -19,32 +19,34 @@ export class PostViewWidget implements OnInit {
 
     @Input() post: POST; // = { ID: 0, author: {}, comment_count: 0, comments: [], guid: '', post_date: '', post_parent: 0, meta: [], count_images: 0, count_files: 0, post_title: 'Loading', post_content: 'Loading', files: [] };
     @Input() page: PAGE;
+
+
+    // filePosition = 'bottom';
+
     constructor(
         public app: AppService,
         private postCreateEditModal: PostCreateEditModalService,
         private forumShare: ForumCodeShareService
     ) {
-        
+
     }
 
     ngOnInit() {
+        // setTimeout( () => this.setFilePosition(), 1 );
         // setTimeout( () => console.log('post view', this.post) , 1000);
-        
     }
 
     onClickPostEdit(post) {
-
         this.postCreateEditModal.open({ post: post }).then(id => {
             console.log(id);
             this.forumShare.updatePost(post);
-        }, err => console.error(err));
-
+        }, err => {
+            console.log(err);
+        });
     }
 
-
-
     onCommentCreate(comment_ID, post: POST) {
-        console.log(`ForumListPage::onCommentCreate()  : ${comment_ID}`);
+        // console.log(`ForumListPage::onCommentCreate()  : ${comment_ID}`);
     }
 
 
@@ -54,7 +56,7 @@ export class PostViewWidget implements OnInit {
         if (post.author.ID) {
             this.app.confirm(this.app.text('confirmDelete')).then(code => {
                 if (code == 'yes') this.postDelete(page, post.ID);
-            });
+            }, () => {});
         }
         else {
             let password = this.app.input('Input password');
@@ -77,18 +79,24 @@ export class PostViewWidget implements OnInit {
         }, err => this.app.warning(err));
     }
 
-
-    /// default
-    get filePositionBottom() {
-        return ! this.filePositionTop;
-    }
-
-    get filePositionTop() {
+    get filePosition() {
         if ( this.post && this.post.category_option && this.post.category_option['file-position'] ) {
-            return this.post.category_option['file-position'] == 'top';
+            return this.post.category_option['file-position'];
         }
-        return false;
+        if ( this.page && this.page.category_option && this.page.category_option['file-position'] ) {
+            return this.page.category_option['file-position'];
+        }
+        return 'bottom';
     }
 
 
+    onClickLike( post: POST, choice: 'like' | 'dislike' ) {
+        if ( this.app.user.isLogout ) return this.app.warning( this.app.e.LOGIN_FIRST );
+        this.app.wp.post({route: 'wordpress.post_like', choice: choice, ID: post.ID, session_id: this.app.user.sessionId})
+            .subscribe( re => {
+                console.log("like: ", re);
+                this.post.meta['like'] = re['like'];
+                this.post.meta['dislike'] = re['dislike'];
+            }, e => this.app.warning(e));
+    }
 }

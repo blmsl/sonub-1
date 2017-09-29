@@ -1,47 +1,47 @@
+<section class="page login-page">
+    <header [innerHTML]="loginHeaderHTML"></header>
+    <main>
 
-        <h1>Login html</h1>
+        <nav class="web buttons" *ngIf="app.isWeb">
+            <button id="google_login" (click)="onClickLoginWithGoogle()">Google Login</button>
+            <button id="facebook_login" (click)="onClickLoginWithFacebook()">Facebook Login</button>
+            <button (click)="onClickLoginWithKakao()">Kakao Login</button>
+            <button (click)="onClickLoginWithNaver()">Naver Login</button>
+        </nav>
 
-
-        <button type="button" routerLink="/">Go to home</button>
-        <button type="button" routerLink="/user/register">Go to Register</button>
-
-        <hr>
-
-
-
-
-        <button id="google_login" (click)="onClickLoginWithGoogle()">Google Login</button>
-        <button id="facebook_login" (click)="onClickLoginWithFacebook()">Facebook Login</button>
-        <button (click)="onClickLoginWithKakao()">Kakao Login</button>
-        <button (click)="onClickLoginWithNaver()">Naver Login</button>
-
-        <hr>
-
-        <button (click)="onClickLoginWithCordovaGoogle()">Cordova Google Login</button>
-        <button (click)="onClickLoginWithCordovaFacebook()">Cordova Facebook Login</button>
-
-
-        <div>
-
-            <form *ngIf="! app.user.isLogin " (ngSubmit)="onSubmitLogin()">
-                <div>
-                    <label for="register_user_login">Username</label>
-                    <input type="text" id="register_user_login" name="user_login" [(ngModel)]="user_login">
-                </div>
-                <div>
-                    <label for="register_user_pass">Password</label>
-                    <input type="password" id="register_user_pass" name="user_pass" [(ngModel)]="user_pass">
-                </div>
-                <button type="submit">Login</button>
-            </form>
-
+        <div class="cordova" *ngIf="app.isCordova">
+            <button (click)="onClickLoginWithCordovaGoogle()">Google Login</button>
+            <button (click)="onClickLoginWithCordovaFacebook()">Facebook Login</button>
         </div>
 
 
-        <div *ngIf="app.user.isLogin">
-            {{ app.user.profile | json }}
+        <div class="login-bottom" [innerHTML]="loginBottomHTML"></div>
 
-            <img src="{{ app.user.profile.photoURL }}" style="max-width: 100%;">
-            <button type="button" (click)="app.logout()">Logout</button>
-        </div>
-        
+
+        <hr>
+        <form *ngIf="! app.user.isLogin" (ngSubmit)="onSubmitLogin()">
+            <table width="330" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td width="110"><label for="register_user_login">{{ app.text('email') }}</label></td>
+                    <td width="220"><input class="w-100" type="text" id="register_user_login" name="user_login" [(ngModel)]="user_login"></td>
+                </tr>
+                <tr>
+                    <td width="110"><label for="register_user_pass">{{ app.text('password') }}</label></td>
+                    <td width="220"><input class="w-100" type="password" id="register_user_pass" name="user_pass" [(ngModel)]="user_pass"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <nav class="buttons">
+                            <button id="login-submit" class="page-form-submit submit" type="submit">Login</button>
+                            <button id="login-register" class="cancel" type="button" routerLink="/user/register">Go to Register</button>
+                        </nav>
+                    </td>
+                </tr>
+            </table>
+
+
+        </form>
+
+    </main>
+</section>

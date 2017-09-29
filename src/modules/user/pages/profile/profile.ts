@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { AppService } from './../../../../providers/app.service';
 
 import { USER_DATA_RESPONSE } from './../../../../providers/wordpress-api/interface';
-import {ProfileEditModalService} from "../modals/profile-edit/profile-edit.modal";
+import {ERROR} from "../../../../etc/error";
+import {Router} from "@angular/router";
 
 
 @Component({
@@ -13,12 +14,18 @@ export class ProfilePage implements OnInit {
 
     userData: USER_DATA_RESPONSE = <USER_DATA_RESPONSE>{};
 
+    text: any = {};
     constructor(
         public app: AppService,
-        private profileEditModal: ProfileEditModalService
+        private router: Router
     ) {
         app.section('user');
         this.initProfile();
+        let codes = [
+            'user_profile',
+            'user_profile_desc',
+        ];
+        app.wp.text(codes, re => this.text = re);
     }
 
     ngOnInit() {
@@ -33,13 +40,26 @@ export class ProfilePage implements OnInit {
         }, error => this.app.warning(error));
     }
 
+    onClickResign() {
+        if (this.app.user.isLogin) {
+            this.app.confirm(this.app.text('resign')).then(code => {
+                if (code == 'yes') {
+                    console.log('confirmResign');
+                    this.app.user.resign().subscribe( res => {
+                        console.log('resign:res', res);
+                        this.router.navigateByUrl('/');
+                    }, err => this.app.warning(err));
+                }
+            }, () => {});
+        }
+        else {
+            this.app.warning(ERROR.CODE_PERMISSION_DENIED_NOT_OWNER);
+        }
 
-    onClickEditProfile() {
-        this.profileEditModal.open(this.userData).then(id => {
-            // console.log('comment edit success:', id);
+    }
 
-            this.initProfile();
-
-        }, err => this.app.warning(err));
+    logout(){
+        this.app.logout();
+        this.router.navigateByUrl('/');
     }
 }

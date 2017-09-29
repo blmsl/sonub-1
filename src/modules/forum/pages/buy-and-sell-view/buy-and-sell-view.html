@@ -1,0 +1,35 @@
+<section class="page buyandsell-view-page">
+    <header>
+        <h4>{{ product?.title }}</h4>
+        <p>Price: ₱{{product?.price}}</p>
+        <p>Is it Used: {{used}}</p>
+        <p>Can it be Delivered: {{deliverable}}</p>
+        <p>Location: {{product?.city}}</p>
+        <p>Contact: {{ product?.contact }}</p>
+        <p>Tag: {{product?.tag}}</p>
+        <nav *ngIf=" app.my(product) && app.user.isLogin">
+            <button routerLink="/buyandsell/edit/{{product?.ID}}"><i class="fa fa-pencil"></i>Edit</button>
+            <button (click)="onClickDelete( product )"><i class="fa fa-trash-o"></i> Delete</button>
+            <button routerLink="/buyandsell">&times; Back</button>
+        </nav>
+    </header>
+    <main>
+        <div *ngIf="product?.files?.length" class="items">
+            <div class="item-mini">
+                <img
+                    *ngFor="let file of product?.files"
+                    src="{{file.url}}"
+                    (click)="selectedImage = file.url"
+                >
+            </div>
+            <div class="item-preview">
+                <img class="selected-image" src="{{selectedImage}}">
+            </div>
+        </div>
+
+        <div class="description">
+            <div class="caption">Description</div>
+            <div class="text">{{product?.description}}</div>
+        </div>
+    </main>
+</section>

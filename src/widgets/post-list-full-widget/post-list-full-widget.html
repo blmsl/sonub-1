@@ -1,4 +1,4 @@
-<section class="post-list-full-widget">
+<section class="post-list-full-widget" id="post-list-{{this.slug}}">
 
     <div class="pages" *ngIf="pages">
         <div class="page" *ngFor="let page of pages">
@@ -15,8 +15,8 @@
             </div>
 
             <div class="posts">
-                <div class="post" *ngFor="let post of page.posts " [attr.post-id]="post.ID">
-                    <post-view-widget [post]="post" [page]="page"></post-view-widget>
+                <div class="post" *ngFor="let post of page.posts" [attr.post-id]="post.ID">
+                    <post-view-widget *ngIf=" post.ID != except?.ID " [post]="post" [page]="page"></post-view-widget>
                 </div>
             </div>
         </div>

@@ -16,23 +16,25 @@ export class LoginPage implements OnInit, AfterViewInit {
 
     user_login;
     user_pass;
+    loginHeaderHTML;
+    loginBottomHTML;
     constructor(
         public app: AppService
     ) {
 
         app.section('user');
-            
+        app.page.cache('login-header', {}, re => this.loginHeaderHTML = re);
+        app.page.cache('login-bottom', {}, re => this.loginBottomHTML = re);
+        
     }
 
     ngOnInit() {
-        console.log("LoginPage::ngOnInit() ...");
+        // console.log("LoginPage::ngOnInit() ...");
     }
 
     ngAfterViewInit() {
         
-        
     }
-
 
 
 
@@ -45,15 +47,16 @@ export class LoginPage implements OnInit, AfterViewInit {
             photoURL: user.photoURL
         };
 
-        // console.log('firebaseSocial: ', profile);
+        
+        // console.log('LoginPage::firebaseSocialLoginSuccess() ==> app::socialLoginSuccess(): ', profile);
         this.app.socialLoginSuccess(profile, () => {
-            console.log("firebase social login success");
-            this.app.loginSuccess();
+            // console.log("LoginPage::firebaseSocialLoginSuccess() ==>  app::socialLoginSuccess() ==> app::loginSuccess()");
+            this.app.loginSuccess(() => this.app.goHome());
         });
     }
 
     firebaseSocialLogniError(e) {
-        console.log(e);
+        // console.log(e);
         // Handle Errors here.
         this.app.warning(e);
     }
@@ -74,10 +77,10 @@ export class LoginPage implements OnInit, AfterViewInit {
 
 
     onSubmitLogin() {
-        console.log("onSubmitLogin() : ...");
+        // console.log("onSubmitLogin() : ...");
         this.app.user.login(this.user_login, this.user_pass).subscribe(profile => {
-            console.log("app.user.login: ", profile);
-            this.app.loginSuccess();
+            // console.log("app.user.login: ", profile);
+            this.app.loginSuccess(() => this.app.goHome());
         }, err => this.app.warning(err));
 
     }
@@ -93,7 +96,7 @@ export class LoginPage implements OnInit, AfterViewInit {
                     url: '/v1/user/me',
                     success: (res) => {
 
-                        console.log('Kakoa login success: ', res);
+                        // console.log('Kakoa login success: ', res);
 
                         let nickname = '';
                         let photoURL = '';
@@ -119,8 +122,8 @@ export class LoginPage implements OnInit, AfterViewInit {
 
                         // console.log('Kakoa profile: ', profile);
                         this.app.socialLoginSuccess(profile, () => {
-                            console.log("Kakao social login success");
-                            this.app.loginSuccess();
+                            // console.log("Kakao social login success");
+                            this.app.loginSuccess(() => this.app.goHome());
                         });
 
                     },
@@ -145,12 +148,13 @@ export class LoginPage implements OnInit, AfterViewInit {
 
 
     cordovaFirebaseAuthLogin(provider) {
-        // alert('signInWithRedirect');
+        // console.log('LoginPage::cordovaFirebaseAuthLogin() ==> SignInWithRedirect(provider)');
         firebase.auth().signInWithRedirect(provider).then(() => {
+            // console.log('LoginPage::cordovaFirebaseAuthLogin() ==> SignInWithRedirect(provider) ==> success ==> getRedirctResult()');
             firebase.auth().getRedirectResult().then(result => {
                 // var token = result.credential.accessToken;
                 let user = result.user;
-                console.log("cordova: social login success. ", user);
+                // console.log("LoginPage::cordovaFirebaseAuthLogin() ==> login success. ", user);
                 this.firebaseSocialLoginSuccess(user);
             })
                 .catch(e => this.firebaseSocialLogniError(e));

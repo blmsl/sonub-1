@@ -1,13 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import {
-    AppService, JOB, JOBS, POST_QUERY_REQUEST, JOB_PAGE, JOB_PAGES, POST_QUERY_RESPONSE
+    AppService, POST_QUERY_REQUEST, JOB_PAGE, JOB_PAGES
 } from './../../../../providers/app.service';
 import { PhilippineRegion } from "../../../../providers/philippine-region";
 import { PageScroll } from './../../../../providers/page-scroll';
 import { Router } from "@angular/router";
-import { PAGE, POST } from "../../../../providers/wordpress-api/interface";
-import { current } from "codelyzer/util/syntaxKind";
+import {JOB, PAGE, POST} from "../../../../providers/wordpress-api/interface";
 
 
 @Component({
@@ -20,6 +19,9 @@ export class JobListPage implements OnInit, OnDestroy {
     formGroup: FormGroup;
 
     pages: JOB_PAGES = [];
+    page: JOB_PAGE;
+
+    profile: JOB;
 
     query = {};
 
@@ -33,7 +35,7 @@ export class JobListPage implements OnInit, OnDestroy {
     inLoading: boolean = false;
     pageNo: number = 0;
     noMorePosts: boolean = false;
-    posts_per_page = 6;
+    posts_per_page = 10;
     ///
 
 
@@ -54,6 +56,9 @@ export class JobListPage implements OnInit, OnDestroy {
     today = new Date();
     currentYear = this.today.getFullYear();
 
+    activeView: boolean = false;
+
+    text: any = {};
     constructor(
         private fb: FormBuilder,
         public app: AppService,
@@ -64,35 +69,15 @@ export class JobListPage implements OnInit, OnDestroy {
         app.section('job');
         region.get_province(re => {
             this.provinces = re;
-        }, e => {
+        }, () => {
         });
 
+        let codes = [
+            'job_desc', 'total', 'look_for'
+        ];
+        app.wp.text(codes, re => this.text = re);
 
-        // let req: POST_QUERY_REQUEST = {
-        //     page: 3,
-        //     posts_per_page: 2,
-        //     query: {
-        //         slug: 'jobs',
-        //         gender: 'M',
-        //         birthday: {
-        //             exp: 'BETWEEN',
-        //             value: '19500101 AND 20800101'
-        //         },
-        //         fullname: {
-        //             exp: 'LIKE',
-        //             value: '%jae%'
-        //         },
-        //         clause: [
-        //             `(ID > 100 AND char_1='M') OR (ID < 99999 AND char_1='F')`,
-        //             `post_type = 'post' OR post_type = 'attachment'`
-        //         ]
-        //     },
-        //     order: 'ID',
-        //     by: 'DESC'
-        // };
-        // this.app.job.search(req).subscribe((page: JOB_PAGE) => {
-        //     console.log("job search", page);
-        // }, e => this.app.warning(e));
+
     }
 
 
@@ -116,8 +101,7 @@ export class JobListPage implements OnInit, OnDestroy {
             city: ['all'],
             minAge: [this.minAge],
             maxAge: [this.maxAge],
-            name: [''],
-            myPost: [false]
+            name: ['']
         });
         this.formGroup.valueChanges
             .debounceTime(1000)
@@ -136,8 +120,7 @@ export class JobListPage implements OnInit, OnDestroy {
             city: 'all',
             minAge: this.minAge,
             maxAge: this.maxAge,
-            name: '',
-            myPost: false
+            name: ''
         });
     }
 
@@ -149,7 +132,7 @@ export class JobListPage implements OnInit, OnDestroy {
         this.pageNo++;
 
         let req: POST_QUERY_REQUEST = {
-            posts_per_page: 6,
+            posts_per_page: this.posts_per_page,
             page: this.pageNo,
             query: this.query,
             order: 'ID',
@@ -158,10 +141,10 @@ export class JobListPage implements OnInit, OnDestroy {
 
 
         this.app.job.search(req).subscribe((page: JOB_PAGE) => {
-            console.log("jobSearch", page);
+            // console.log("jobSearch", page);
             this.displayPage(page);
         }, e => {
-            console.log("loadPage::e::", e);
+            // console.log("loadPage::e::", e);
             this.inLoading = false;
             this.noMorePosts = true;
         });
@@ -176,19 +159,13 @@ export class JobListPage implements OnInit, OnDestroy {
 
 
     onValueChanged(data?: any) {
-        console.log('onValueChanges::data::', data);
+        // console.log('onValueChanges::data::', data);
         let clause = [];
         this.query = {};
 
 
         // GENDER
-        if (data.male != data.female) {
-            this.query['gender'] = data.male ? 'm' : 'f';
-        }
-        else {
-            clause.push(`char_1='m' OR char_1='f'`)
-        }
-
+        if (data.male != data.female) this.query['gender'] = data.male ? 'm' : 'f';
 
         // FULL NAME
         if (data.name) {
@@ -216,10 +193,6 @@ export class JobListPage implements OnInit, OnDestroy {
             value: `${max} AND ${min}`
         };
 
-
-        if (data.myPost) this.query['post_author'] = this.app.user.id;
-
-
         // PROFESSION
         if (data.profession != 'all') this.query['profession'] = data.profession;
 
@@ -237,11 +210,10 @@ export class JobListPage implements OnInit, OnDestroy {
             } else this.query['city'] = data.city;
         }
 
-
         // CLAUSE
         if (clause.length) this.query['clause'] = clause;
 
-        console.log('REQUEST ON VALUE CHANGE :::', this.query);
+        // console.log('REQUEST ON VALUE CHANGE :::', this.query);
 
         this.pages = [];
         this.noMorePosts = false;
@@ -249,55 +221,8 @@ export class JobListPage implements OnInit, OnDestroy {
         this.loadPage();
     }
 
-
-    // loadCache(req: JOB_LIST_REQUEST) {
-    //     let p = this.app.cacheGetPage(req);
-    //     if (p) {
-    //         // console.log("cached for ", this.app.cacheKeyPage(req));
-    //         this.jobs.push(p);
-    //     }
-    // }
-
-
-    // /**
-    //  *
-    //  * @param req
-    //  * @param page
-    //  */
-    // addOrReplacePage(req: JOB_LIST_REQUEST, page: JOB_PAGE) {
-    //     this.prepare(page);
-    //     let i = page.paged - 1;
-    //     if (i < this.pages.length) {
-    //         // console.log("replace cached page for: ", this.app.cacheKeyPage(req));
-    //         this.pages[i] = page;
-
-
-    //     }
-    //     else this.pages.push(page);
-    //     this.app.cacheSetPage(req, page);
-    // }
-
-
-    // prepare(page: JOB_PAGE) {
-    //     if (page && page.posts && page.posts.length) {
-    //         for (let post of page.posts) {
-    //             // prepare
-    //         }
-    //     }
-    // }
-
-    // get request(): JOB_LIST_REQUEST {
-    //     return {
-    //         category_name: 'jobs',
-    //         paged: this.pageNo,
-    //         posts_per_page: this.posts_per_page,
-    //         thumbnail: '160x100'
-    //     };
-    // }
-
-
     onClickProvince() {
-        console.log('Province::', this.formGroup.value.province);
+        // console.log('Province::', this.formGroup.value.province);
         if (this.formGroup.value.province != 'all') {
             this.formGroup.patchValue({ city: this.formGroup.value.province });
             this.getCities();
@@ -315,8 +240,7 @@ export class JobListPage implements OnInit, OnDestroy {
                 this.cities = re;
                 this.showCities = true;
             }
-        }, e => {
-        });
+        }, () => {});
     }
 
     get cityKeys() {
@@ -350,31 +274,32 @@ export class JobListPage implements OnInit, OnDestroy {
         else return this.app.anonymousPhotoURL;
     }
 
-    onClickEdit(job) {
-        this.router.navigate(['/job/edit', job.ID]);
+    onClickEdit() {
+        this.router.navigate(['/job/edit/', this.profile.ID]);
     }
 
 
-    onClickDelete(post: POST, page: PAGE) {
-        if (post.author.ID) {
+    onClickDelete() {
+        if (this.profile.author.ID) {
             this.app.confirm(this.app.text('confirmDelete')).then(code => {
-                if (code == 'yes') this.postDelete(page, post.ID);
-            });
+                if (code == 'yes') this.postDelete(this.profile.ID);
+            }, () => {});
         }
         else {
             let password = this.app.input('Input password');
-            if (password) this.postDelete(page, post.ID, password);
+            if (password) this.postDelete(this.profile.ID, password);
         }
     }
 
-    postDelete(page, ID, password?) {
+    postDelete(ID, password?) {
         // debugger;
         this.app.forum.postDelete({ ID: ID, post_password: password }).subscribe(res => {
             console.log("file deleted: ", res);
 
-            let index = page.posts.findIndex(post => post.ID == res.ID);
+            let index = this.page.posts.findIndex(post => post.ID == res.ID);
             if (res.mode == 'delete') {
-                page.posts.splice(index, 1);
+                this.page.posts.splice(index, 1);
+                this.activeView = false;
             }
         }, err => this.app.warning(err));
     }
@@ -391,5 +316,17 @@ export class JobListPage implements OnInit, OnDestroy {
         this.resetForm();
     }
 
+    onClickShowDetail(job, page) {
+            this.activeView  = true;
+            this.profile = job;
+            this.page = page;
+            history.pushState('','', `/job/view/${job.ID}`);
+            setTimeout( () => this.app.scrollToY(0));
+    }
+    onClickShowList(){
+        this.activeView = false;
+        history.pushState('','', '/job'  );
+        setTimeout( () => this.app.scrollTo( 'job'+this.profile.ID, '#job'+this.profile.ID ));
+    }
 
 }

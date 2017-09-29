@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AppService, FILES, FILE } from './../../../../providers/app.service';
-import { BUYANDSELL_CREATE, POST } from "../../../../providers/wordpress-api/interface";
+import { AppService, FILES } from './../../../../providers/app.service';
+import { BUYANDSELL, BUYANDSELL_CREATE } from "../../../../providers/wordpress-api/interface";
 import { FileUploadWidget } from "../../../../widgets/file-upload/file-upload";
 import { PhilippineRegion } from "../../../../providers/philippine-region";
 import { error, ERROR} from "../../../../etc/error";
@@ -16,8 +16,8 @@ export class BuyAndSellCreateEditPage {
 
     @ViewChild('fileUploadWidget') public fileUploadComponent: FileUploadWidget;
 
-    title: string = null;
-    description: string = null;
+    title: string = '';
+    description: string = '';
 
     price: number = null;
     usedItem: 'y' | 'n' | 'x' = 'n';
@@ -25,17 +25,21 @@ export class BuyAndSellCreateEditPage {
 
     city: string = 'all';
     province: string = 'all';
-    tag: string = null;
-    contact: string = null;
+    tag: string = '';    // can be product, brands, shops
+    contact: string = '';
 
 
     files: FILES = [];
-    file: FILE;
     ID: number;
 
     provinces: Array<string> = [];
     cities: Array<string> = [];
     showCities: boolean = false;
+
+    errorMessage: string = null;
+    loading: boolean = false;
+    text: any = {};
+
 
     constructor(
         private region: PhilippineRegion,
@@ -47,8 +51,24 @@ export class BuyAndSellCreateEditPage {
 
         region.get_province(re => {
             this.provinces = re;
-        }, e => {
+        }, () => {
         });
+
+        let codes = [
+            'buyandsell_edit_create',
+            'buyandsell_edit_create_desc',
+            'tag_title', 'tag_desc', 'tag_placeholder',
+            'is_used', 'is_used_desc', 'yes', 'no', 'not_applicable',
+            'location', 'select_province', 'city',
+            'price', 'price_desc', 'price_holder',
+            'deliverable', 'deliverable_desc',
+            'buyandsell_title_holder', 'buyandsell_title_desc',
+            'buyandsell_description', 'buyandsell_description_desc', 'buyandsell_description_holder',
+            'contact_info', 'contact_info_holder', 'contact_info_desc',
+            'buyandsell_upload_image', 'buyandsell_upload_image_desc', 'upload_image',
+            'buyandsell_submit'
+        ];
+        app.wp.text(codes, re => this.text = re);
 
         if( !app.user.isLogin ) {
             this.app.warning( error( ERROR.LOGIN_FIRST) );
@@ -59,42 +79,40 @@ export class BuyAndSellCreateEditPage {
         let params = activeRoute.snapshot.params;
         if (params['id']) {
 
-            this.app.wp.post({ route: 'wordpress.get_post', ID: params['id'] })
-                .subscribe((post: POST) => {
+            this.app.bns.data({ route: 'wordpress.get_post', ID: params['id'] })
+                .subscribe((buyAndSell: BUYANDSELL) => {
 
-                    if ( post.author.ID && post.author.ID != app.user.id) {
-                            this.app.warning( error( ERROR.CODE_PERMISSION_DENIED) );
+                    if ( buyAndSell.author.ID && buyAndSell.author.ID != app.user.id) {
+                            this.app.warning( error( ERROR.CODE_PERMISSION_DENIED_NOT_OWNER) );
                             this.router.navigateByUrl('/buyandsell');
                             return;
                     }
 
-                    console.log('edit post: ', post);
-                    this.ID = post.ID;
-                    this.title = post.post_title;
-                    this.description = post.post_content;
-                    this.price = post.int_1;
-                    this.usedItem = <any>post.char_1;
-                    this.deliverable = <any>post.char_2;
-                    this.city = post.varchar_1;
-                    this.province = post.varchar_2;
-                    this.tag = post.varchar_3;
-                    this.contact = post.varchar_4;
+                    // console.log('edit post: ', buyAndSell);
 
+                    this.ID = buyAndSell.ID;
+                    this.title = buyAndSell.title;
+                    this.description = buyAndSell.description;
+                    this.price = buyAndSell.price;
+                    this.usedItem = buyAndSell.usedItem;
+                    this.deliverable = buyAndSell.deliverable;
+                    this.city = buyAndSell.city;
+                    this.province = buyAndSell.province;
+                    this.tag = buyAndSell.tag;
+                    this.contact = buyAndSell.contact;
 
-                    if (post.files.length) {
-                        this.files[0] = post.files[0];
-                        this.file = post.files[0];
+                    if (buyAndSell.files.length) {
+                        this.files = buyAndSell.files;
                     }
+                    if( buyAndSell.tag.length && buyAndSell.province!= 'all' ) this.getCities();
 
-                    if( post.varchar_2 != 'all' ) this.getCities();
                 }, e => this.app.warning(e));
-
         }
 
     }
 
     onClickProvince() {
-        console.log('Province::', this.province);
+        // console.log('Province::', this.province);
         if (this.province != 'all') {
             this.city = this.province;
             this.getCities();
@@ -111,7 +129,7 @@ export class BuyAndSellCreateEditPage {
                 this.cities = re;
                 this.showCities = true;
             }
-        }, e => {
+        }, () => {
         });
     }
 
@@ -121,7 +139,34 @@ export class BuyAndSellCreateEditPage {
 
     onClickSubmit() {
 
+        this.errorMessage = null;
+        if (!this.tag && !this.tag.length) {
+            this.app.warning( error(-90031,'*tag is required'));
+            return this.errorMessage = '*tag is required';
+        }
+        if (this.province == 'all') {
+            this.app.warning( error(-90032,'*Province is required'));
+            return this.errorMessage = '*Province is required';
+        }
+        if (!this.price) {
+            this.app.warning( error(-90033,'*price is required'));
+            return this.errorMessage = '*price is required';
+        }
+        if (!this.title && !this.title.length) {
+            this.app.warning( error(-90034,'*title is required'));
+            return this.errorMessage = '*title is required';
+        }
+        if (!this.description && !this.description.length) {
+            this.app.warning(error(-90035, '*description is required'));
+            return this.errorMessage = '*description is required';
+        }
+        if (!this.contact && !this.contact.length) {
+            this.app.warning(error(-90036, '*contact information is required'));
+            return this.errorMessage = '*contact information is required';
+        }
 
+
+        this.loading = true;
         let data: BUYANDSELL_CREATE = {
             tag: this.tag,
             usedItem: this.usedItem,
@@ -139,9 +184,15 @@ export class BuyAndSellCreateEditPage {
         console.log('onClickSubmit::data:: ', data);
         this.app.bns.create(data).subscribe(res => {
             console.log("buyandsell create/edit: ", res);
-            this.app.alert.open({ content: this.app.text('saved') });
+
+            this.loading = false;
+            this.app.alert.open({ content: this.app.text('saved'), class: 'buyandsell-success' });
             this.router.navigateByUrl('/buyandsell');
-        }, e => this.app.warning(e));
+        }, e => {
+            this.loading = false;
+            this.app.warning(e);
+            this.errorMessage = this.app.getErrorString(e);
+        });
 
     }
 

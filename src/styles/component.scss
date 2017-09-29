@@ -4,15 +4,15 @@
 
 
 .hidden-360-down {
-    display: none;
+    display: none !important;
     @media ( min-width: 361px ) {
-        display: initial;
+        display: initial !important;
     }
 }
 .hidden-320-down {
-    display: none;
+    display: none !important;
     @media ( min-width: 321px ) {
-        display: initial;
+        display: initial !important;
     }
 }
 
@@ -112,6 +112,7 @@
     white-space: nowrap;
 }
 .ellipsis {
+    max-width: 100px;   /// need to adjust
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -126,18 +127,27 @@
  * POSITION
  */
  .relative {
-     position: relative;
+     position: relative!important;
  }
  .absolute {
-     position: absolute;
+     position: absolute!important;
  }
 .fixed {
     position: fixed;
 }
-.top-right {
-    top: 0;
-    right: 0;
+.top {
+    top: 0!important;
 }
+.right{
+    right: 0!important;
+}
+
+.top-10px { top: 10px!important; }
+.top-20px { top: 20px!important; }
+.top-30px { top: 30px!important; }
+.top-40px { top: 40px!important; }
+.top-50px { top: 50px!important; }
+
 
 /**
  *
@@ -227,6 +237,10 @@
     width: 36px;
     height: 36px;
 }
+.size-48px {
+    width: 48px;
+    height: 48px;
+}
 
 .h-5em {
     height: 5em;
@@ -239,8 +253,23 @@
 }
 
 
-.h-100px { height: 100px; }
+
 .w-100px { width: 100px; }
+.h-100px { height: 100px; }
+.xy-100px { width: 100px; height: 100px; }
+.xy-50px { width: 50px; height: 50px; }
+
+.min-width-50px { min-width: 50px!important; }
+.min-width-100px { min-width: 100px!important; }
+.min-width-150px { min-width: 150px!important; }
+.min-width-200px { min-width: 200px!important; }
+.min-width-250px { min-width: 250px!important; }
+
+.max-width-50px { max-width: 50px!important; }
+.max-width-100px { max-width: 100px!important; }
+.max-width-150px { max-width: 150px!important; }
+.max-width-200px { max-width: 200px!important; }
+.max-width-250px { max-width: 250px!important; }
 
 
 .photo-icon-2x {
@@ -270,4 +299,34 @@
 
 .border-radius-50 {
     border-radius: 50%;
+}
+
+
+////
+.box-border {
+    border: 1px solid #ccc;
+}
+
+
+
+/// hover
+
+.hover-blue:hover {
+    background-color: blue;
+    color: white;
+}
+
+
+
+//// nav.loader
+
+nav.loader {
+    display: block;
+    margin: .5em 0 .25em;
+    i {
+        color: blue;
+    }
+    span {
+        
+    }
 }

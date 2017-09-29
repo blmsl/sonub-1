@@ -7,6 +7,10 @@ export let TEXT = {
         en: 'Welcome, #name.',
         ko: '어서오십시오, #name님'
     },
+    loading: {
+        en: 'loading',
+        ko: '로딩 중'
+    },
     login: {
         en: 'Login',
         ko: '로그인'
@@ -14,6 +18,10 @@ export let TEXT = {
     register: {
         en: 'Register',
         ko: '회원가입'
+    },
+    more: {
+        en: 'more',
+        ko: '더보기'
     },
     name: {
         en: 'Name',
@@ -30,6 +38,22 @@ export let TEXT = {
     password: {
         en: 'Password',
         ko: '비밀번호'
+    },
+    title: {
+        en: 'Title',
+        ko: '제목'
+    },
+    summary: {
+        en: 'Summary',
+        ko: '요약'
+    },
+    domain: {
+        en: 'Domain',
+        ko: '도메인'
+    },
+    display_advertisement: {
+        en: 'Display advertisement',
+        ko: '광고 표시'
     },
     home: {
         en: 'Home',
@@ -198,11 +222,11 @@ export let TEXT = {
     },
 
     /// menu, button text
-    my_posts_menu: {
-        en: 'List my posts',
-        ko: '내가 작성한 글 목록'
-    },
 
+
+    recent_popluar_posts: { en: 'Recent Issues', ko: '최근 이슈' },
+    input_chat_message: { en: 'Please input message.', ko: '채팅 메세지를 입력하세요.' },
+    unread_chat_messages: { en: 'New Messages', ko: '새 채팅 메세지' },
 
     /// forum create name
     food: {
@@ -292,24 +316,114 @@ export let TEXT = {
         en: 'Upload photos',
         ko: '사진 올리기'
     },
+    no_activity_description: {
+        en: 'Ooh, You have no activity record. Try to write posts and comments.',
+        ko: '앗, 활동 기록이 없네요. 글이나 코멘트를 작성해 보세요.'
+    },
+
+    no_more_data: {
+        en: 'Ooh, There is no more data.',
+        ko: '앗, 더 이상 자료가 없습니다.'
+    },
+    _resign: {
+        en: 'Resign',
+        ko: '탈퇴'
+    },
+    profile_update: {
+        en: 'Update',
+        ko: '회원 정보 수정'
+    },
+    logout: {
+        en: 'Logout',
+        ko: '로그아웃'
+    },
+    change_password: {
+        en: 'Change Password',
+        ko: '비밀번호 변경'
+    },
+
+    gender: {
+        en: 'Gender',
+        ko: '성별'
+    },
+    birthday: {
+        en: 'Birthday',
+        ko: '성별'
+    },
+    male: {
+        en: 'Male',
+        ko: '남자'
+    },
+    female: {
+        en: 'Female',
+        ko: '여자'
+    },
+    change_profile_photo: {
+        en: 'Change Profile Photo',
+        ko: '회원 사진 변경'
+    },
+    save: {
+        en: 'Save',
+        ko: '저장'
+    },
+    save_profile: {
+        en: 'Save Profile',
+        ko: '회원 정보 저장'
+    },
 
     ///
     confirmDelete: {
         en: {
             content: 'Do you want to delete #no?',
             buttons:
-            [
-                { code: 'yes', text: 'Yes' },
-                { code: 'no', text: 'No' }
-            ]
+                [
+                    { code: 'yes', text: 'Yes' },
+                    { code: 'no', text: 'No' }
+                ]
         },
         ko: {
             content: '#no번 글을 삭제를 하시겠습니까?',
             buttons:
-            [
-                { code: 'yes', text: '예' },
-                { code: 'no', text: '아니오' }
-            ]
+                [
+                    { code: 'yes', text: '예' },
+                    { code: 'no', text: '아니오' }
+                ]
+        }
+    },
+    changePassword: {
+        en: {
+            content: 'Change Password Success',
+            buttons:
+                [
+                    { code: 'close', text: 'Close' }
+                ]
+        },
+        ko: {
+            content: 'Change Password Success',
+            buttons:
+                [
+                    { code: 'close', text: '닫기' }
+                ]
+        }
+    },
+    resign: {
+        en: {
+            title: 'Delete your account permanently.',
+            content: 'Are you sure you want to deactivate your account?',
+            buttons:
+                [
+                    { code: 'yes', text: 'Yes' },
+                    { code: 'no', text: 'No' }
+                ]
+        },
+        ko: {
+            title: '회원 탈퇴',
+            content: '정말 회원 탈퇴를 하시겠습니까?',
+            buttons:
+                [
+                    { code: 'yes', text: '예' },
+                    { code: 'no', text: '아니오' }
+                ]
         }
     },
 
@@ -318,7 +432,14 @@ export let TEXT = {
     this_post_is_not_owned_by_you_on_delete_post: {
         en: 'You cannot delete this. Permission denied.',
         ko: '글을 삭제 할 수 없습니다. 권한 없음.'
-    }
+    },
+
+
+    /// chat
+    recent_chat_users: {
+        en: 'Recent Chat Users',
+        ko: '최근 채팅 사용자 목록'
+    },
 };
 
 
@@ -327,7 +448,6 @@ TEXT['auth/account-exists-with-different-credential'] = {
     ko: TEXT['social_register_email_exist']['ko']
 };
 
-
 /**
  * For number code.
  */
@@ -335,18 +455,15 @@ TEXT[ERROR.EMPTY] = { en: 'Error object is empty', ko: '에러 값이 없습니�
 TEXT[ERROR.NO_CODE] = { en: 'No Code. This may be server error or server down.', ko: '코드가 없습니다. 서버 에러 또는 서버 다운 일 수 있습니다.' };
 TEXT[ERROR.RESPONSE_EMPTY] = { en: 'Response from backend is empty. This may be a server error.', ko: '서버로 부터 결과 값이 없습니다. 서버 에러 일 수 있습니다.' };
 TEXT[ERROR.RESPONSE_NO_CODE] = { en: 'Response from backend has no code', ko: '서버로 부터 응답 중에 코드 값이 없습니다.' };
-TEXT[ERROR.CODE_KEY_IS_EMPTY] = { en: 'Key is empty', ko: '키 값이 존재하지 않습니다.' };
-TEXT[ERROR.CODE_COMMENT_DUPLICATE] = { en: 'Please do not comment with same text.', ko: '비슷한 내용의 덧글을 반복적으로 작성 할 수 없습니다.' };
 TEXT[ERROR.LOGIN_FIRST] = { en: 'Please login first', ko: '로그인을 먼저하십시오.' };
-TEXT[ERROR.CODE_WRONG_SESSION_ID] = { en: 'Wrong login information. Wrong session. Please login again.', ko: '로그인 오류. 로그인 정보가 올바르지 않습니다. 로그인을 다시 해 주세요.' };
-TEXT[ERROR.CODE_NO_USER_BY_THAT_SESSION_ID] = { en: 'Wrong loing information. No user. Please login again.', ko: '로그인 오류. 로그인 정보를 찾을 수 없습니다. 다시 로그인을 해 주세요.' };
-TEXT[ERROR.CODE_PERMISSION_DENIED] = { en: 'Permission denied', ko: '권한이 없습니다.' };
-
+TEXT[ERROR.CODE_PERMISSION_DENIED_NOT_OWNER] = { en: 'You do not have permission.', ko: '권한이 없습니다.'};
+TEXT[ERROR.CHAT_ROOM_PATH] = {en: 'Cannot find chat server path. Please inform it to web master.', ko: '채팅 서버의 경로를 찾을 수 없습니다. 웹마스터에게 연락해 주세요.'};
+TEXT[ERROR.WRONG_PATH] = {en: 'You have accessed with wrong route.', ko: '잘못된 경로로 접속을 하였습니다.'};
 /**
- * 
+ *
  * @note default language is 'en'.
- * @param code 
- * @param args 
+ * @param code
+ * @param args
  */
 export function text(code, args?) {
     let ln;

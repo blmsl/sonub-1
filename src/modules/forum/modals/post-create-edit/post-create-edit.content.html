@@ -10,20 +10,20 @@
     <div *ngIf=" ! app.user.isLogin " class="anonymouse-form">
         <div class="container m-0 p-0">
             <div class="row mt-2 mb-1">
-                <div class="col-2">{{ app.text('name') }}</div>
-                <div class="col-10"><input type="text" name="post_author_name" [(ngModel)]="post_author_name"></div>
+                <div class="col-4 fs-sm">{{ app.text('name') }}</div>
+                <div class="col-8"><input class="w-100" type="text" name="post_author_name" [(ngModel)]="post_author_name"></div>
             </div>
             <div class="row my-1">
-                <div class="col-2">{{ app.text('email') }}</div>
-                <div class="col-10"><input type="email" name="post_author_email" [(ngModel)]="post_author_email"></div>
+                <div class="col-4 fs-sm">{{ app.text('email') }}</div>
+                <div class="col-8"><input class="w-100" type="email" name="post_author_email" [(ngModel)]="post_author_email"></div>
             </div>
             <div class="row my-1">
-                <div class="col-2">{{ app.text('mobile_no') }}</div>
-                <div class="col-10"><input type="text" name="post_author_phone_number" [(ngModel)]="post_author_phone_number"></div>
+                <div class="col-4 fs-sm">{{ app.text('mobile_no') }}</div>
+                <div class="col-8"><input class="w-100" type="text" name="post_author_phone_number" [(ngModel)]="post_author_phone_number"></div>
             </div>
             <div class="row mt-1 mb-2">
-                <div class="col-2">{{ app.text('password') }}</div>
-                <div class="col-10"><input type="password" name="post_password" [(ngModel)]="post_password"></div>
+                <div class="col-4 fs-sm">{{ app.text('password') }}</div>
+                <div class="col-8"><input class="w-100" type="password" name="post_password" [(ngModel)]="post_password"></div>
             </div>
         </div>
     </div>
@@ -32,17 +32,11 @@
 
 
     <div class="mt-2">
-        <textarea class="p-1 w-100 h-15em" name="post_content" [(ngModel)]="post_content" #textareaPostContent (keyup)="contentInput(textareaPostContent.value)"
+        <textarea class="p-1 w-100 h-10em" [class.h-15em]=" longthenContent " name="post_content" [(ngModel)]="post_content"
+            #textareaPostContent
+            (keyup)="contentInput(textareaPostContent.value)"
             placeholder="{{ app.text('input_content') }}"></textarea>
     </div>
-
-    <!--     
-        <select class="form-control form-control-sm">
-                    <option value="">{{ app.text('choose_forum') }}</option>
-                    <option value="discussion">{{ app.text('discussion') }}</option>
-                    <option value="qna">{{ app.text('qna') }}</option>
-                    <option value="news">{{ app.text('news') }}</option>
-                  </select> -->
 
 </div>
 <div class="modal-footer justify-content-between">
@@ -55,14 +49,16 @@
             </span>
     </div>
     <div>
-        <button *ngIf="options.category" type="submit" class="btn btn-secondary" (click)="onClickSubmit()">{{ app.text('submit_post') }}</button>
-        <button *ngIf="options.post" type="submit" class="btn btn-secondary" (click)="onClickEdit()">{{ app.text('update_post') }}</button>
-        <button type="button" class="btn btn-secondary" (click)="onClickCancel()">{{ app.text('cancel') }}</button>
+        <button *ngIf="options.category" type="submit" class="post-create-button btn btn-secondary" (click)="onClickSubmit()">{{ app.text('submit_post') }}</button>
+        <button *ngIf="options.post" type="submit" class="post-edit-button btn btn-secondary" (click)="onClickEdit()">{{ app.text('update_post') }}</button>
+        <button type="button" class="post-cancel-button btn btn-secondary" (click)="onClickCancel()">{{ app.text('cancel') }}</button>
     </div>
 
 </div>
 
 
-<hr class="mx-2" *ngIf="files && files.length">
+<hr class="m-0" *ngIf="files && files.length">
 
 <file-upload-widget #fileUploadWidget [title]="false" [fileSelectionButton]="false" [files]="files" [post_password]="post_password"></file-upload-widget>
+
+<site-preview-widget [preview]="preview.result" [edit]="true" [loading]="preview.loading"></site-preview-widget>

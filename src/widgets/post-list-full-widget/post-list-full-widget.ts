@@ -24,6 +24,7 @@ import { ForumCodeShareService } from '../../modules/forum/forum-code-share.serv
 export class PostListFullWidget implements OnInit, AfterViewInit, OnDestroy {
 
     @Input() category;
+    @Input() except;    // display posts except this post.
 
     ///
     slug: string = null;
@@ -44,6 +45,8 @@ export class PostListFullWidget implements OnInit, AfterViewInit, OnDestroy {
         private postCreateEditModal: PostCreateEditModalService,
         private forumShare: ForumCodeShareService
     ) {
+
+        
 
         // setTimeout(() => {
         //     this.onClickPostCreate();
@@ -77,7 +80,6 @@ export class PostListFullWidget implements OnInit, AfterViewInit, OnDestroy {
 
 
     ngAfterViewInit() {
-
         this.watch = this.pageScroll.watch('body', 350).subscribe(e => this.loadPage());
     }
 
@@ -92,7 +94,6 @@ export class PostListFullWidget implements OnInit, AfterViewInit, OnDestroy {
         this.noMorePosts = false;
         this.pageNo = 0;
         this.pages = [];
-
     }
     loadPage() {
         // console.log(`::loadPage(). noMorePosts: ${this.noMorePosts}, inLoading: ${this.inLoading}`);
@@ -114,14 +115,17 @@ export class PostListFullWidget implements OnInit, AfterViewInit, OnDestroy {
             if (page.paged == page.max_num_pages) {
                 this.noMorePosts = true;
             }
+            this.app.forum.prePage( page );
             this.addOrReplacePage(req, page);
         }, err => this.app.displayError(this.app.getErrorString(err)));
     }
 
+    
+
     loadCache(req: POST_LIST) {
         let p = this.app.cacheGetPage(req);
         if (p) {
-            console.log("cached for ", this.app.cacheKeyPage(req));
+            // console.log("cached for ", this.app.cacheKeyPage(req));
             this.pages.push(p);
         }
     }
@@ -133,12 +137,11 @@ export class PostListFullWidget implements OnInit, AfterViewInit, OnDestroy {
     addOrReplacePage(req: POST_LIST, page: POST_LIST_RESPONSE) {
         let i = page.paged - 1;
         if (i < this.pages.length) {
-            console.log("replace cached page for: ", this.app.cacheKeyPage(req));
+            // console.log("replace cached page for: ", this.app.cacheKeyPage(req));
             this.pages[i] = page;
         }
         else this.pages.push(page);
         this.app.cacheSetPage(req, page);
-
     }
 
 
@@ -153,11 +156,12 @@ export class PostListFullWidget implements OnInit, AfterViewInit, OnDestroy {
 
     insertPost(post_ID) {
         this.app.forum.postData(post_ID).subscribe(post => {
-            console.log('this.posts:: ', this.pages);
+            // console.log('this.posts:: ', this.pages);
 
             if (!this.pages[0].posts) {
                 this.pages[0]['posts'] = [];
             }
+            this.app.forum.pre( post );
             this.pages[0].posts.unshift(post);
 
         }, e => this.app.warning(e));

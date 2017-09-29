@@ -37,7 +37,7 @@
  * @endcode
  * 
  * 
- * @code example 2
+ * @code example 2 - 게시판 페이지 별로 로딩 할 때 좋음.
     
     watch;
     inLoading: boolean = false;
@@ -131,15 +131,12 @@ export class PageScroll {
             })
             .filter((x: any) => {
                 if (element['offsetTop'] === void 0) return false; // @attention this is error handling for some reason, especially on first loading of each forum, it creates "'offsetTop' of undefined" error.
-
                 let elementHeight = element['offsetTop'] + element['clientHeight'];
                 let windowYPosition = window.pageYOffset + window.innerHeight;
                 // console.log("page scroll reaches at bottom: windowYPosition=" + windowYPosition + ", elementHeight-distance=" + (elementHeight-distance));
-
                 if (windowYPosition > elementHeight - distance) { // page scrolled. the distance to the bottom is within 200 px from
                     this.scrollCountOnDistance++;
                     // console.log( "scrollCountOnDistance", this.scrollCountOnDistance );
-
                     return true;
                 }
 

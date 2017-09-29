@@ -80,3 +80,21 @@
         right: .5rem;
     }
 }
+
+
+.inline-job-list-page-header {
+    width:100%;
+    margin: 0 2px .25em;
+}
+
+.job {
+    .info {
+        font-size: .9em;
+        .full-name {
+            text-transform: capitalize;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+}
